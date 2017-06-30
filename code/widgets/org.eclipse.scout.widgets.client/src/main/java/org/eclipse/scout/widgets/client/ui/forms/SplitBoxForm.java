@@ -177,6 +177,11 @@ public class SplitBoxForm extends AbstractForm implements IPageForm {
           return PreviewBox.class;
         }
 
+        @Override
+        protected String getConfiguredSplitterPositionType() {
+          return SPLITTER_POSITION_TYPE_RELATIVE_SECOND;
+        }
+
         @Order(10)
         public class SplitHorizontalField extends AbstractSplitBox {
 
@@ -683,16 +688,31 @@ public class SplitBoxForm extends AbstractForm implements IPageForm {
           @Override
           protected void execInitField() {
             setValue(getSplitVerticalField().getSplitterPositionType());
+            updateSplitterPositionVFieldBounds();
+          }
+
+          @Override
+          protected String validateValueInternal(String rawValue) {
+            if (rawValue == null) {
+              return getInitValue();
+            }
+            return super.validateValueInternal(rawValue);
           }
 
           @Override
           protected void execChangedValue() {
             getSplitVerticalField().setSplitterPositionType(getValue());
+            updateSplitterPositionVFieldBounds();
+          }
+
+          protected void updateSplitterPositionVFieldBounds() {
             if (ObjectUtility.isOneOf(getValue(), ISplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST, ISplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND)) {
               getFieldByClass(SplitterPositionVField.class).setMaxValue(BigDecimal.ONE);
+              getFieldByClass(MinSplitterPositionField.class).setMaxValue(BigDecimal.ONE);
             }
             else {
               getFieldByClass(SplitterPositionVField.class).setMaxValue(null);
+              getFieldByClass(MinSplitterPositionField.class).setMaxValue(null);
             }
           }
         }
@@ -731,12 +751,27 @@ public class SplitBoxForm extends AbstractForm implements IPageForm {
 
           @Override
           protected BigDecimal getConfiguredMinValue() {
-            return new BigDecimal("0");
+            return BigDecimal.ZERO;
           }
 
           @Override
           protected void execInitField() {
             setValue(NumberUtility.toBigDecimal(getSplitVerticalField().getMinSplitterPosition()));
+
+            getSplitVerticalField().addPropertyChangeListener(ISplitBox.PROP_MIN_SPLITTER_POSITION, new PropertyChangeListener() {
+              @Override
+              public void propertyChange(PropertyChangeEvent evt) {
+                if (!isValueChanging()) {
+                  setValueChangeTriggerEnabled(false);
+                  try {
+                    setValue(NumberUtility.toBigDecimal((Double) evt.getNewValue()));
+                  }
+                  finally {
+                    setValueChangeTriggerEnabled(true);
+                  }
+                }
+              }
+            });
           }
 
           @Override
@@ -766,17 +801,30 @@ public class SplitBoxForm extends AbstractForm implements IPageForm {
           @Override
           protected void execInitField() {
             setValue(getSplitHorizontalField().getSplitterPositionType());
+            updateSplitterPositionHFieldBounds();
           }
 
           @Override
           protected void execChangedValue() {
             getSplitHorizontalField().setSplitterPositionType(getValue());
+            updateSplitterPositionHFieldBounds();
+          }
+
+          protected void updateSplitterPositionHFieldBounds() {
             if (ObjectUtility.isOneOf(getValue(), ISplitBox.SPLITTER_POSITION_TYPE_RELATIVE_FIRST, ISplitBox.SPLITTER_POSITION_TYPE_RELATIVE_SECOND)) {
               getFieldByClass(SplitterPositionHField.class).setMaxValue(BigDecimal.ONE);
             }
             else {
               getFieldByClass(SplitterPositionHField.class).setMaxValue(null);
             }
+          }
+
+          @Override
+          protected String validateValueInternal(String rawValue) {
+            if (rawValue == null) {
+              return getInitValue();
+            }
+            return super.validateValueInternal(rawValue);
           }
         }
 
