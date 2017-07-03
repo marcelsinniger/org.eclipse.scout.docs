@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDec
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.classid.ClassId;
@@ -32,7 +33,6 @@ import org.eclipse.scout.widgets.heatmap.client.ui.form.fields.heatmapfield.IHea
 import org.eclipse.scout.widgets.heatmap.client.ui.form.fields.heatmapfield.IHeatmapListener;
 import org.eclipse.scout.widgets.heatmap.client.ui.form.fields.heatmapfield.MapPoint;
 import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.CloseButton;
-import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.GroupBox;
 import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.GroupBox.CenterXField;
 import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.GroupBox.CenterYField;
 import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.GroupBox.HeatmapField;
@@ -40,6 +40,7 @@ import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBo
 import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.GroupBox.XField;
 import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.GroupBox.YField;
 import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.GroupBox.ZoomLevelField;
+import org.eclipse.scout.widgets.heatmap.client.ui.forms.HeatmapFieldForm.MainBox.TopBox.BlubbrField;
 
 @Order(100000.0)
 public class HeatmapFieldForm extends AbstractForm implements IAdvancedExampleForm {
@@ -69,8 +70,8 @@ public class HeatmapFieldForm extends AbstractForm implements IAdvancedExampleFo
     return getFieldByClass(MainBox.class);
   }
 
-  public GroupBox getTopBox() {
-    return getFieldByClass(GroupBox.class);
+  public BlubbrField getBlubbrField() {
+    return getFieldByClass(BlubbrField.class);
   }
 
   public HeatmapField getHeatmapField() {
@@ -160,8 +161,57 @@ public class HeatmapFieldForm extends AbstractForm implements IAdvancedExampleFo
       setStatusVisible(false);
     }
 
+    @Order(0)
+    @ClassId("44318e96-8734-4cc9-8818-583d1b0ff788")
+    public class TopBox extends AbstractGroupBox {
+      @Override
+      protected String getConfiguredLabel() {
+        return "Blubbr Box";
+      }
+
+      @Override
+      protected boolean getConfiguredExpandable() {
+        return true;
+      }
+
+      @Override
+      protected void execInitField() {
+        setExpanded(false);
+      }
+
+      @Order(1000)
+      @ClassId("3590e240-8941-4699-8726-cd020e5d8c81")
+      public class BlubbrField extends AbstractStringField {
+        @Override
+        protected String getConfiguredLabel() {
+          return "Blubbr";
+        }
+
+        @Override
+        protected int getConfiguredMaxLength() {
+          return 128;
+        }
+      }
+
+    }
+
     @Order(1000.0)
     public class GroupBox extends AbstractGroupBox {
+
+      @Override
+      protected String getConfiguredLabel() {
+        return "Heatmap";
+      }
+
+      @Override
+      protected boolean getConfiguredExpandable() {
+        return true;
+      }
+
+      @Override
+      protected void execInitField() {
+        setExpanded(false);
+      }
 
       @Order(1000.0)
       public class HeatmapField extends AbstractHeatmapField {

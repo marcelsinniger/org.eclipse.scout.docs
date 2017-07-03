@@ -3,7 +3,17 @@ scout.HeatmapField = function() {
 };
 scout.inherits(scout.HeatmapField, scout.FormField);
 
+function busySleep(millis) {
+  var date = new Date();
+  var curDate = null;
+  do {
+    curDate = new Date();
+  }
+  while (curDate - date < millis);
+}
+
 scout.HeatmapField.prototype._render = function($parent) {
+  busySleep(3000);
   this.addContainer($parent, 'heatmap-field');
   this.addLabel();
   this.addStatus();
